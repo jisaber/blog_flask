@@ -18,8 +18,8 @@ flask run
 [GCC 6.3.0 20170516] on linux  
 Type "help", "copyright", "credits" or   "license" for more information.) 
 
-* flask-1.1.1 <br>pip3 install flask
+* flask-1.1.1<br>pip3 install flask
 
 * python-dotenv-0.10.3<br>pip install python-dotenv 用来管理环境变量的
 
-
+* flask-wtf<br>pip3 install flask-wtf 用来管理密码的校验值 Successfully installed WTForms-2.2.1 flask-wtf-0.14.2
