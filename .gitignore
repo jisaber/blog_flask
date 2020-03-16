@@ -1,3 +1,4 @@
 /microblog/venv/
 *.pyc
+/venv/
 /microblog/migrations/
