@@ -31,3 +31,5 @@ Successfully installed SQLAlchemy-1.3.12 flask-sqlalchemy-2.4.1
 需要换个源pip3 install Flask-Migrate -i https://pypi.douban.com/simple
 
 * flask-login<br>登录管理工具pip3 install flask-login, Successfully installed flask-login-0.4.1
+
+* flask-bootstrap<br>bootstrap pip install flask-bootstrap, Successfully installed dominate-2.5.1 flask-bootstrap-3.3.7.1 visitor-0.1.3
