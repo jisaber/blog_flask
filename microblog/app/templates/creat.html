@@ -1,0 +1,85 @@
+{% extends "base_infec.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+
+<!-- 如果是超级用户则会显示配置的内容，如果是普通用户则没有这一块的内容 -->
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.quick_form(form) }}
+        <!-- </div> -->
+    <!-- </div> -->
+    <!-- <div class="row"> -->
+      <!-- <div class="col-md-6"> -->
+        <!-- 如果允许显示传染源，则在这个地方显示 -->
+        
+      </div>
+  </div>
+
+<div><br><p>传染源是：<p></siv>
+<!-- 查询当前超级用户的配置 -->
+    <div class="col-md-6">
+        <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+            <div class="col p-4 d-flex flex-column position-static">
+              <strong class="d-inline-block mb-2 text-primary"></strong>
+              <h3 class="mb-0">Exchange Record</h3>
+              <p class="card-text mb-auto">这里是交换记录</p>
+              <!-- 如果超级用户允许查看交换记录 -->
+                xianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                xianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                xianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br><br>
+              <a href="#" color:#fff class="stretched-link"><button type="button" class="btn btn-primary">Back Top</button></a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+            <div class="col p-4 d-flex flex-column position-static">
+              <strong class="d-inline-block mb-2 text-primary"></strong>
+              <h3 class="mb-0">Infection Result</h3>
+              <p class="card-text mb-auto">感染结果</p>
+              <!-- 如果超级用户允许查看感染结果 -->
+                xianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                xianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                xianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br>
+                ianshi ganran guocheng <br><br>
+                <a href="#" color:#fff class="stretched-link"><button type="button" class="btn btn-primary">Back Top</button></a>
+            </div>
+        </div>
+    </div> 
+{% endblock %}

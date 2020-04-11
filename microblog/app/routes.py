@@ -3,7 +3,11 @@ from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm
+
+
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, PostCase, InputGene
+
+#下面是进行DB操作的内容
 from app.models import User, Post
 
 @app.route('/', methods=['GET', 'POST'])
@@ -44,7 +48,25 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('login.html', title="Sign In", form=form) 
+    return render_template('creat.html', title="Sign In", form=form) 
+
+@app.route('/creat', methods=['GET', 'POST'])
+def creat():
+    form = PostCase()
+    if form.validate_on_submit():
+        return str(form.casename.data) + str(form.infect_id.data) +  str(form.show_result.data == False) + str(form.show_exchange.data) + str(form.show_source.data) + str(form.allow_post.data)
+
+    # if form.validate_on_submit():
+    #     user = User.query.filter_by(username=form.username.data).first()
+    #     if user is None or not user.check_password(form.password.data):
+    #         flash('Invalid username or password')
+    #         return redirect(url_for('login'))
+    #     login_user(user, remember=form.remember_me.data)
+    #     next_page = request.args.get('next')
+    #     if not next_page or url_parse(next_page).netloc != '':
+    #         next_page = url_for('index')
+    #     return redirect(next_page)
+    return render_template('creat.html', title="Sign In", form=form)
 
 @app.route('/logout')
 def logout():
@@ -80,6 +102,11 @@ def user(username):
     return render_template('user.html', user=user, posts=posts.items,
                            next_url=next_url, prev_url=prev_url)
 
+@app.route('/infectious')
+@login_required
+def infectious():
+    return render_template('infectious.html')
+
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
@@ -96,7 +123,7 @@ def edit_profile():
         db.session.commit()
         flash('Your changes have been saved.')
         return redirect(url_for('edit_profile'))
-    elif request.method == 'GET':
+    elif request.method == 'GET': #填入旧的值
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile', form=form)
@@ -144,3 +171,15 @@ def explore():
         if posts.has_prev else None
     return render_template("index.html", title='Explore', posts=posts.items,
                           next_url=next_url, prev_url=prev_url)
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/input', methods=['GET', 'POST'])
+def inputgene():
+    form = InputGene()
+    if form.validate_on_submit():
+        return str(form.inputgene.data)
+    return render_template('input.html', title="input", form=form)
+    # return render_template('about.html')

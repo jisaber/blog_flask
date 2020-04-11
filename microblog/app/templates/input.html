@@ -1,0 +1,26 @@
+{% extends "base_infec.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<div class="container" style="margin-top: 50px;">
+    <div class="divForm">
+        {% if form %}
+            {{ wtf.quick_form(form) }}
+        {% endif %}
+    </div>
+</div>
+<style type="text/css">
+.divForm{
+position: absolute;/*绝对定位*/
+width: 300px;
+height: 200px;
+
+/*border: 1px solid red;*/
+text-align: center;/*(让div中的内容居中)*/
+top: 50%;
+left: 50%;
+margin-top: -000px;
+margin-left: -150px;
+}
+</style>
+{% endblock %}
