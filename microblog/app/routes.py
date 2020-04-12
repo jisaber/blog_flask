@@ -1,5 +1,6 @@
 from datetime import datetime
-from flask import render_template, flash, redirect, url_for, request
+import time
+from flask import render_template, session, flash, redirect, url_for, request
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
@@ -8,7 +9,8 @@ from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, PostCase, InputGene
 
 #下面是进行DB操作的内容
-from app.models import User, Post
+from app.models import User, Post, Case, Exchange, Superuser, Persongene
+from operator import and_, or_
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -48,7 +50,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('creat.html', title="Sign In", form=form) 
+    return render_template('creat.html', title="Sign In", form=form)
 
 @app.route('/creat', methods=['GET', 'POST'])
 def creat():
@@ -76,7 +78,6 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return "1111"
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -176,10 +177,82 @@ def explore():
 def about():
     return render_template('about.html')
 
-@app.route('/input', methods=['GET', 'POST'])
+@app.route('/inputgene', methods=['GET', 'POST'])
 def inputgene():
     form = InputGene()
+    case = Case.query.all()
     if form.validate_on_submit():
         return str(form.inputgene.data)
+    return render_template('input.html', title="input", form=form, case=case, show_case=True)
+    # return render_template('about.html')
+
+# @app.route('/<username>/inputgene/<casename>', methods=['GET', 'POST'])
+@app.route('/inputgene/<casename>', methods=['GET', 'POST'])
+def inputgene_case(casename):
+    #找到当前的case基于casename
+    case = Case.query.filter_by(casename=casename).first()
+    form = InputGene()
+    # return render_template('error.html', msg="qingchongxintianxie")
+    if form.validate_on_submit():
+        if len(form.inputgene.data.split( )) == 2:
+            
+            title = form.inputgene.data.split( )[0]
+            body = form.inputgene.data.split( )[1]
+            flash('You submit is success! you submit is [{}]'.format(title + " " + body))
+            # return render_template('input.html', title="input", form=form)
+
+            # user = User(username=form.username.data, email=form.email.data)
+            # user.set_password(form.password.data)
+            # db.session.add(user)
+            # db.session.commit()
+
+            if Persongene.query.filter(and_(Persongene.self_gene == title, Persongene.case_id == case.id)).all():
+                if Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).all():
+                    temp1 = Persongene.query.filter(and_(Persongene.self_gene == title, Persongene.case_id == case.id)).first().self_body
+                    temp2 = Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).first().self_body
+
+                    temp_title = temp1 + ' ' + body + ' ' + temp2 
+                    Persongene.query.filter(and_(Persongene.self_gene == title, Persongene.case_id == case.id)).first().self_body = temp_title
+
+                    temp_body = temp2 + ' ' + title + ' ' + temp1
+                    Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).first().self_body = temp_body
+                    db.session.commit()
+                else:
+                    temp1 =Persongene.query.filter(and_(Persongene.self_gene == title, Persongene.case_id == case.id)).first().self_body 
+
+                    temp_title = temp1 + ' ' + body
+                    Persongene.query.filter(and_(Persongene.self_gene == title, Persongene.case_id == case.id)).first().self_body = temp_title
+
+                    temp_body = title + ' ' + temp1
+                    persongene = Persongene(self_gene = body, self_body = temp_body, case_id=case.id, username=current_user.username)
+
+                    db.session.add(persongene)
+                    db.session.commit()
+            else:
+                if Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).all(): 
+                    temp2 = Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).first().self_body
+
+                    temp_title = body + ' ' + temp2
+
+                    persongene = Persongene(self_gene = title, self_body = temp_title, case_id=case.id, username=current_user.username)
+                    
+                    temp_body =  temp2 + ' ' + title
+                    Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).first().self_body = temp_body
+                    
+                    db.session.add(persongene)
+                    db.session.commit()
+                else:
+                    persongene1 = Persongene(self_gene = title, self_body = body, case_id = case.id, username = current_user.username)
+                    persongene2 = Persongene(self_gene = body, self_body = title, case_id = case.id)
+                    db.session.add(persongene1)
+                    db.session.add(persongene2)
+                    db.session.commit()
+            # return str(form.inputgene.data)
+            # return render_template('error.html', msg=title+body)
+        else:
+            flash('You submit is error!')
+            return render_template('error.html', msg="123")
+
+#整体处理完成之后还需要把这次提交放到交换记录里面
     return render_template('input.html', title="input", form=form)
     # return render_template('about.html')

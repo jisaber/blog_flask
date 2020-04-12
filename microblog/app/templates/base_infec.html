@@ -18,9 +18,9 @@
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('inputgene') }}">输入基因型</a></li>
-                    <li><a href="{{ url_for('infectious') }}">交换记录</a></li>
-                    <li><a href="{{ url_for('infectious') }}">感染结果</a></li>
+                    <li><a href="{{ url_for('inputgene') }}">InputGene</a></li>
+                    <li><a href="{{ url_for('infectious') }}">ExchangeRecord</a></li>
+                    <li><a href="{{ url_for('infectious') }}">InfectionResult</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="{{ url_for('about') }}">About</a></li>
@@ -36,7 +36,9 @@
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
+            <div class="alert alert-success" style="text-align: center">
+                <button aria-hidden="true" data-dismiss="alert" class="close" type="button">&times;</button>
+                <strong>{{ message }}</strong></div>
             {% endfor %}
         {% endif %}
         {% endwith %}

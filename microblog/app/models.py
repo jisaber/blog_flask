@@ -18,6 +18,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+
     about_me = db.Column(db.String(4096))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -72,58 +73,60 @@ class Post(db.Model):
     def __repr__(self):
         return '<Post {}>'.format(self.body)
 
+#超级用户的内容，需要一个更加管理员的入口，可以新增何删除超级用户，这样我就可以随意给用户添加进来了
+class Superuser(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), index=True, unique=True)
+    email = db.Column(db.String(120), index=True, unique=True)
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+
+    cases = db.relationship('Case', backref='author', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Superuser {}>'.format(self.username)
+
 # 所有的测试，需要关联到某个超级id。
 # 需要有超级ID才可以使用，每次读取之前都需要去超级ID中查看下
 class Case(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     casename = db.Column(db.String(64), index=True, unique=True)
     
-    infect_id = db.Column(db.String(64), index=True, unique=True)
+    infect_id = db.Column(db.String(64))
     show_result = db.Column(db.Boolean)
     show_path = db.Column(db.Boolean)
     show_source = db.Column(db.Boolean)
     allow_post =  db.Column(db.Boolean)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    exchange_record = db.relationship('Case', backref='case_num', lazy='dynamic')
-    person_gene = db.relationship('PersonGene', backref='person_gene', lazy='dynamic')
+    Superuser_id = db.Column(db.Integer, db.ForeignKey('superuser.id'))
+
+    exchange_record = db.relationship('Exchange', backref='case_num', lazy='dynamic')
+    person_gene = db.relationship('Persongene', backref='case_num', lazy='dynamic')
 
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     #调试用的
     def __repr__(self):
         return '<Case {}>'.format(self.infect_id)
 
-#超级用户的内容，需要一个更加管理员的入口，可以新增何删除超级用户，这样我就可以随意给用户添加进来了
-class SuperUser(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
-    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def __repr__(self):
-        return '<SuperUser {}>'.format(self.username)
-
 #传染过程的数据库，唯一链接到某个case, 仅作为展示用
 class Exchange(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    exchange_record = db.Column(db.String(64), index=True, unique=True)
-
+    exchange_record = db.Column(db.String(64), index=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    
     case_id = db.Column(db.Integer, db.ForeignKey('case.id'))
 
     def __repr__(self):
         return '<Exchange {}>'.format(self.id)
 
 #真正的存储每个人的基因型的内容。username表示用户输入的内容
-class PersonGene(UserMixin, db.Model):
+class Persongene(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True)
+    username = db.Column(db.String(64), index=True)
     self_gene = db.Column(db.String(65535), index=True, unique=True)
+    self_body = db.Column(db.String(65535), index=True)
 
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     case_id = db.Column(db.Integer, db.ForeignKey('case.id'))
 
     def __repr__(self):
-        return '<PersonGene {}>'.format(self.username)
+        return '<Persongene {}>'.format(self.username)

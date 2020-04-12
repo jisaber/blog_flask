@@ -1,13 +1,31 @@
 {% extends "base_infec.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
+
+
 {% block app_content %}
+
+<!-- {% if casename %} -->
+<!-- {% for i in [1,2,3,4,5,6,7] %} -->
+        <!-- {% include '_case.html' %} -->
+<!-- {% endfor %} -->
+<!-- {% endif %} -->
+
 <div class="container" style="margin-top: 50px;">
-    <div class="divForm">
-        {% if form %}
-            {{ wtf.quick_form(form) }}
-        {% endif %}
+    
+    {% if show_case %}
+    <div class="col-md-4">
+        {% for icase in case %}
+                {% include '_case.html' %}
+        {% endfor %}
     </div>
+    {% else %}
+        <div class="divForm">
+            {% if form %}
+                {{ wtf.quick_form(form) }}
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
 <style type="text/css">
 .divForm{

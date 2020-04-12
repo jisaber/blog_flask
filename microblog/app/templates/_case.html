@@ -1,0 +1,10 @@
+<table class="table table-hover">
+            <a href="{{ url_for('inputgene_case', casename=icase.casename) }}">
+                <h4>
+                    You can choice 
+                    Case id:{{icase.id}} 
+                    Case name:{{icase.casename}} 
+                    Case owner:{{icase.author.id}}
+                </h4>
+            </a>
+</table>
