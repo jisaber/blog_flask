@@ -6,7 +6,7 @@ from werkzeug.urls import url_parse
 from app import app, db
 
 
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, PostCase, InputGene
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, PostCase, InputGene, ManageCase
 
 #下面是进行DB操作的内容
 from app.models import User, Post, Case, Exchange, Superuser, Persongene
@@ -50,25 +50,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('creat.html', title="Sign In", form=form)
-
-@app.route('/creat', methods=['GET', 'POST'])
-def creat():
-    form = PostCase()
-    if form.validate_on_submit():
-        return str(form.casename.data) + str(form.infect_id.data) +  str(form.show_result.data == False) + str(form.show_exchange.data) + str(form.show_source.data) + str(form.allow_post.data)
-
-    # if form.validate_on_submit():
-    #     user = User.query.filter_by(username=form.username.data).first()
-    #     if user is None or not user.check_password(form.password.data):
-    #         flash('Invalid username or password')
-    #         return redirect(url_for('login'))
-    #     login_user(user, remember=form.remember_me.data)
-    #     next_page = request.args.get('next')
-    #     if not next_page or url_parse(next_page).netloc != '':
-    #         next_page = url_for('index')
-    #     return redirect(next_page)
-    return render_template('creat.html', title="Sign In", form=form)
+    return render_template('login.html', title="Sign In", form=form)
 
 @app.route('/logout')
 def logout():
@@ -129,7 +111,6 @@ def edit_profile():
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile', form=form)
 
-
 @app.route('/follow/<username>')
 @login_required
 def follow(username):
@@ -181,8 +162,11 @@ def about():
 def inputgene():
     form = InputGene()
     case = Case.query.all()
+    if not case:
+        return render_template('input.html', title="input", show_creat=True)
     if form.validate_on_submit():
-        return str(form.inputgene.data)
+        return render_template('input.html', title="input", case=case, show_case=True)
+
     return render_template('input.html', title="input", form=form, case=case, show_case=True)
     # return render_template('about.html')
 
@@ -198,32 +182,35 @@ def inputgene_case(casename):
             
             title = form.inputgene.data.split( )[0]
             body = form.inputgene.data.split( )[1]
-            flash('You submit is success! you submit is [{}]'.format(title + " " + body))
-            # return render_template('input.html', title="input", form=form)
 
-            # user = User(username=form.username.data, email=form.email.data)
-            # user.set_password(form.password.data)
-            # db.session.add(user)
-            # db.session.commit()
+            context = title + ' ' + body
+            exchange = Exchange(exchange_record = context,timestamp = datetime.utcnow(),
+                username= current_user.username, case_id = case.id)
+            db.session.add(exchange)
+            db.session.commit()
 
             if Persongene.query.filter(and_(Persongene.self_gene == title, Persongene.case_id == case.id)).all():
                 if Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).all():
                     temp1 = Persongene.query.filter(and_(Persongene.self_gene == title, Persongene.case_id == case.id)).first().self_body
                     temp2 = Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).first().self_body
 
-                    temp_title = temp1 + ' ' + body + ' ' + temp2 
+                    temp_title = temp1 + ' ' + body + ' ' + temp2
+                    temp_title = ' '.join(list(set(temp_title.split())))
                     Persongene.query.filter(and_(Persongene.self_gene == title, Persongene.case_id == case.id)).first().self_body = temp_title
 
                     temp_body = temp2 + ' ' + title + ' ' + temp1
+                    temp_body = ' '.join(list(set(temp_body.split())))
                     Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).first().self_body = temp_body
                     db.session.commit()
                 else:
                     temp1 =Persongene.query.filter(and_(Persongene.self_gene == title, Persongene.case_id == case.id)).first().self_body 
 
                     temp_title = temp1 + ' ' + body
+                    temp_title = ' '.join(list(set(temp_title.split())))
                     Persongene.query.filter(and_(Persongene.self_gene == title, Persongene.case_id == case.id)).first().self_body = temp_title
 
                     temp_body = title + ' ' + temp1
+                    temp_body = ' '.join(list(set(temp_body.split())))
                     persongene = Persongene(self_gene = body, self_body = temp_body, case_id=case.id, username=current_user.username)
 
                     db.session.add(persongene)
@@ -233,26 +220,127 @@ def inputgene_case(casename):
                     temp2 = Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).first().self_body
 
                     temp_title = body + ' ' + temp2
-
+                    temp_title = ' '.join(list(set(temp_title.split())))
                     persongene = Persongene(self_gene = title, self_body = temp_title, case_id=case.id, username=current_user.username)
                     
                     temp_body =  temp2 + ' ' + title
+                    temp_body = ' '.join(list(set(temp_body.split())))
                     Persongene.query.filter(and_(Persongene.self_gene == body, Persongene.case_id == case.id)).first().self_body = temp_body
                     
                     db.session.add(persongene)
                     db.session.commit()
                 else:
                     persongene1 = Persongene(self_gene = title, self_body = body, case_id = case.id, username = current_user.username)
-                    persongene2 = Persongene(self_gene = body, self_body = title, case_id = case.id)
+                    persongene2 = Persongene(self_gene = body, self_body = title, case_id = case.id, username = current_user.username)
                     db.session.add(persongene1)
                     db.session.add(persongene2)
                     db.session.commit()
+            flash('You submit is success! you submit is [{}]'.format(title + " " + body))
             # return str(form.inputgene.data)
             # return render_template('error.html', msg=title+body)
         else:
             flash('You submit is error!')
-            return render_template('error.html', msg="123")
+            return render_template('error.html', msg="Right submit is such as '1 2'")
 
 #整体处理完成之后还需要把这次提交放到交换记录里面
-    return render_template('input.html', title="input", form=form)
+    return render_template('input.html', title="input", form=form,
+    case=case, casename1=casename)
     # return render_template('about.html')
+
+@app.route('/showresult/<casename>', methods=['GET', 'POST'])
+def show_result(casename):
+    result = []
+    case = Case.query.filter_by(casename=casename).first()
+    resultp = Persongene.query.filter(Persongene.case_id == case.id).all()
+    for iresult in resultp:
+        if case.infect_id in iresult.self_body:
+            result.append([iresult.self_gene, "OK"])
+        else:
+            result.append([iresult.self_gene, "ERR"])
+    return render_template('showresult.html', title="showresult",
+        result=result, show_result=case.is_show_result, show_source=case.is_show_source, 
+        case=case, casename=casename)
+
+@app.route('/showrecord/<casename>', methods=['GET', 'POST'])
+def show_record(casename):
+    case = Case.query.filter_by(casename=casename).first()
+    record = Exchange.query.filter(Exchange.case_id == case.id).all()
+    return render_template('showrecord.html', title="showrecord", 
+       record=record, show_record=case.is_show_record, case=case, casename=casename)
+
+#管理特定的case
+#@csrf.exempt
+@app.route('/manage/<casename>', methods=['GET', 'POST'])
+def manage_case(casename):
+    superuser = Superuser.query.filter_by(username=current_user.username).first()
+    curr_case = Case.query.filter_by(casename=casename).first()
+    case = Case.query.filter(and_(Case.casename == casename, Case.Superuser_id == superuser.id)).first()
+    if not case:
+        return render_template('error.html', title="Error", msg="You are not this case owner")
+
+    form = ManageCase()
+    if form.validate_on_submit():
+        if form.infect_id.data:
+            curr_case.infect_id = form.infect_id.data
+        curr_case.is_show_result = form.show_result.data
+        curr_case.is_show_record = form.show_record.data
+        curr_case.is_show_source = form.show_source.data
+        curr_case.allow_post = form.allow_post.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+    
+    #无论如何和都需要填入旧的值
+    form.infect_id.data = curr_case.infect_id
+    form.show_result.data = curr_case.is_show_result
+    form.show_record.data = curr_case.is_show_record
+    form.show_source.data = curr_case.is_show_source
+    form.allow_post.data = curr_case.allow_post
+
+    result = []
+    resultp = Persongene.query.filter(Persongene.case_id == curr_case.id).all()
+    for iresult in resultp:
+        if case.infect_id in iresult.self_body:
+            result.append([iresult.self_gene, "Infectiong"])
+        else:
+            result.append([iresult.self_gene, "OK"])
+    record = Exchange.query.filter(Exchange.case_id == curr_case.id).all()
+    return render_template('manage.html', title='Edit Profile', form=form,
+        case=curr_case, result=result, record=record)
+
+#显示所有case
+@app.route('/manage', methods=['GET', 'POST'])
+def manage():
+    #是否是超级用户如果不是，直接提示错误
+    superuser = Superuser.query.filter_by(username=current_user.username).first()
+    if not superuser:
+        return render_template('error.html', title="Error", msg="You are not a teacher")
+    form = PostCase()
+    #显示当前用户所创建的所有case，并且提供一个创建新case的按钮
+    return render_template('manage_case.html', title="Manage", form=form,
+        show_case=True,username=current_user.username, case=superuser.cases)
+
+@app.route('/<username>/creat', methods=['GET', 'POST'])
+def creat(username):
+    #是否是超级用户如果不是，直接提示错误
+    superuser = Superuser.query.filter_by(username=username).first()
+    if not superuser:
+        return render_template('error.html', title="Error", msg="You are not a teacher")
+    
+    form = PostCase()
+    if form.validate_on_submit():
+        if Case.query.filter_by(casename=form.casename.data).first():
+            flash('Case is existence!')
+            return render_template('creat.html', title="CreatCase", form=form)
+        else:
+            case = Case(casename = form.casename.data,
+            infect_id = form.infect_id.data, 
+            is_show_result = form.show_result.data,
+            is_show_record = form.show_record.data,
+            is_show_source = form.show_source.data,
+            allow_post = form.allow_post.data,
+            Superuser_id = superuser.id)
+            db.session.add(case)
+            db.session.commit()
+            return redirect(url_for('manage_case', casename=form.casename.data))
+    #开始处理数据写入数据库
+    return render_template('creat.html', title="CreatCase", form=form)

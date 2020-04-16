@@ -92,9 +92,9 @@ class Case(db.Model):
     casename = db.Column(db.String(64), index=True, unique=True)
     
     infect_id = db.Column(db.String(64))
-    show_result = db.Column(db.Boolean)
-    show_path = db.Column(db.Boolean)
-    show_source = db.Column(db.Boolean)
+    is_show_result = db.Column(db.Boolean)
+    is_show_record = db.Column(db.Boolean)
+    is_show_source = db.Column(db.Boolean)
     allow_post =  db.Column(db.Boolean)
 
     Superuser_id = db.Column(db.Integer, db.ForeignKey('superuser.id'))
@@ -110,6 +110,7 @@ class Case(db.Model):
 #传染过程的数据库，唯一链接到某个case, 仅作为展示用
 class Exchange(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), index=True)
     exchange_record = db.Column(db.String(64), index=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     case_id = db.Column(db.Integer, db.ForeignKey('case.id'))
@@ -121,7 +122,7 @@ class Exchange(UserMixin, db.Model):
 class Persongene(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True)
-    self_gene = db.Column(db.String(65535), index=True, unique=True)
+    self_gene = db.Column(db.String(65535), index=True)
     self_body = db.Column(db.String(65535), index=True)
 
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)

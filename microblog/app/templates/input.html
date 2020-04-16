@@ -1,18 +1,18 @@
 {% extends "base_infec.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
-
-
 {% block app_content %}
-
-<!-- {% if casename %} -->
-<!-- {% for i in [1,2,3,4,5,6,7] %} -->
-        <!-- {% include '_case.html' %} -->
-<!-- {% endfor %} -->
-<!-- {% endif %} -->
+<div>
+    {% if show_creat %}
+    <a href="{{ url_for('creat', username=current_user.username) }}">
+        <h4>
+            There is no case, to creat case!
+        </h4>
+    </a>
+    {% endif %}
+</div>
 
 <div class="container" style="margin-top: 50px;">
-    
     {% if show_case %}
     <div class="col-md-4">
         {% for icase in case %}
@@ -20,11 +20,24 @@
         {% endfor %}
     </div>
     {% else %}
-        <div class="divForm">
-            {% if form %}
-                {{ wtf.quick_form(form) }}
-            {% endif %}
-        </div>
+        {% if case.allow_post %}
+            <div class="divForm">
+                {% if form %}
+                    {{ wtf.quick_form(form) }}<br>
+                    <a href="{{ url_for('show_record', casename=casename1) }}" color:#fff class="stretched-link">
+                        <button type="button" class="btn btn-primary">Show Info</button></a>            
+                {% endif %}
+            </div>
+        {% else %}
+            <div>
+                <h3>The submit function was closed by the teacher, 
+                please contact him/her to open</h3> 
+            </div>
+            </div> 
+                <a href="{{ url_for('show_record', casename=casename1) }}" color:#fff class="stretched-link">
+                    <button type="button" class="btn btn-primary">Show Info</button></a>
+            </div>
+        {% endif %}   
     {% endif %}
 </div>
 <style type="text/css">

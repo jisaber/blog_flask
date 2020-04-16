@@ -47,13 +47,20 @@ class PostForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class PostCase(FlaskForm):
-    #post = TextAreaField('Say something', validators=[DataRequired(), Length(min=1, max=4096)])
     casename = TextAreaField('Set casename(*must input and unique)', validators=[DataRequired(), Length(min=1, max=16)])
-    infect_id = TextAreaField('Set infect_id(can default is 0)', validators=[Length(min=0, max=128)])
-    show_source = BooleanField('is allow show infection source')
-    show_result = BooleanField('is allow show infection result?', default=True)
-    show_exchange = BooleanField('is allow show exchange', default=True)
-    allow_post = BooleanField('is allow submit', default=True)
+    infect_id = TextAreaField('Set infect_id(Default is Null)', validators=[Length(min=0, max=128)])
+    show_source = BooleanField('allow show infection source', default=False)
+    show_result = BooleanField('allow show infection result', default=True)
+    show_record = BooleanField('allow show exchange record', default=True)
+    allow_post = BooleanField('allow submit', default=True)
+    submit = SubmitField('Submit')
+
+class ManageCase(FlaskForm):
+    infect_id = TextAreaField('Set infect_id(Default is Null)', validators=[Length(min=0, max=128)])
+    show_source = BooleanField('allow show infection source')
+    show_result = BooleanField('allow show infection result', default=True)
+    show_record = BooleanField('allow show exchange', default=True)
+    allow_post = BooleanField('allow submit', default=True)
     submit = SubmitField('Submit')
 
 class InputGene(FlaskForm):

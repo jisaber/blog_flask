@@ -1,0 +1,20 @@
+{% extends "base_infec.html" %}
+
+{% block app_content %}
+    <a href="{{ url_for('show_record', casename=casename) }}" color:#fff class="stretched-link">
+        <button type="button" class="btn btn-primary">Go to record</button></a>
+    <a href="{{ url_for('inputgene_case', casename=casename) }}" color:#fff class="stretched-link">
+        <button type="button" class="btn btn-primary">Go to input</button></a>
+
+    {% if case.is_show_source %} 
+        <p style="color:red"><h4>{{case.infect_id}}</h4></p>
+    {% endif %}
+
+    {% if case.is_show_result %} 
+        {% for igene, iresult in result %}
+            {% include '_result.html' %}
+        {% endfor %}
+    {% else %}
+        <h4>Not allow to show result</h4>
+    {% endif %}
+{% endblock %}

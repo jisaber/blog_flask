@@ -1,0 +1,41 @@
+{% extends "base_infec.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<div class="row">
+    <div class="col-md-6">
+        {% if form %}
+            {{ wtf.quick_form(form) }}  
+        {% endif %}    
+    </div>
+</div>
+
+<div>
+    <br><h4>Infection is: {{ case.infect_id }}</h4>
+</div>
+
+<div class="col-md-6">
+    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+        <div class="col p-4 d-flex flex-column position-static">
+            <strong class="d-inline-block mb-2 text-primary"></strong>
+            <h3 class="mb-0">Exchange Record</h3>
+            {% for irecord in record %}
+                {% include '_exchange.html' %}
+            {% endfor %}
+            <a href="#" color:#fff class="stretched-link"><button type="button" class="btn btn-primary">Back Top</button></a>
+        </div>
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+        <div class="col p-4 d-flex flex-column position-static">
+            <strong class="d-inline-block mb-2 text-primary"></strong>
+            <h3 class="mb-0">Infection Result</h3>
+            {% for igene, iresult in result %}
+                {% include '_result.html' %}
+            {% endfor %}
+            <a href="#" color:#fff class="stretched-link"><button type="button" class="btn btn-primary">Back Top</button></a>
+        </div>
+    </div>
+</div> 
+{% endblock %}

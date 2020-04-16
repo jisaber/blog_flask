@@ -1,0 +1,18 @@
+{% extends "base_infec.html" %}
+
+{% block app_content %}
+    <a href="{{ url_for('show_result', casename=casename) }}" color:#fff class="stretched-link">
+        <button type="button" class="btn btn-primary">Go to result</button></a>
+    <a href="{{ url_for('inputgene_case', casename=casename) }}" color:#fff class="stretched-link">
+        <button type="button" class="btn btn-primary">Go to input</button></a>
+
+
+    {% if case.is_show_record %}
+        {% for irecord in record%}
+            {% include '_exchange.html' %}
+        {% endfor %}
+    {% else %}
+        <h4>Not allow to show record</h4>
+    {% endif %}
+    
+{% endblock %}
