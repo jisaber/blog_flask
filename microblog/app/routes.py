@@ -6,7 +6,7 @@ from werkzeug.urls import url_parse
 from app import app, db
 
 
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, PostCase, InputGene, ManageCase
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, PostCase, InputGene, ManageCase, CreatSuper
 
 #下面是进行DB操作的内容
 from app.models import User, Post, Case, Exchange, Superuser, Persongene
@@ -101,13 +101,14 @@ def before_request():
 def edit_profile():
     form = EditProfileForm(current_user.username)
     if form.validate_on_submit():
-        current_user.username = form.username.data
+        flash('Your changes have been saved.')
+        #current_user.username = form.username.data
         current_user.about_me = form.about_me.data
         db.session.commit()
         flash('Your changes have been saved.')
         return redirect(url_for('edit_profile'))
     elif request.method == 'GET': #填入旧的值
-        form.username.data = current_user.username
+        #form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile', form=form)
 
@@ -158,12 +159,47 @@ def explore():
 def about():
     return render_template('about.html')
 
+#username = db.Column(db.String(64), index=True, unique=True)
+#email = db.Column(db.String(120), index=True, unique=True)
+
+@app.route('/admin', methods=['GET', 'POST'])
+@login_required
+def admin():
+    username=current_user.username
+    form=CreatSuper()
+    if username == "admin":
+        if form.validate_on_submit():
+            # 判断超级用户在不在当前的列表里面，如果不在直接返回
+            # 否则添加进去
+            superuser1 = User.query.filter_by(username=form.supername.data).first()
+            superuser2 = Superuser.query.filter_by(username=form.supername.data).first()
+            if superuser1:
+                if superuser2:
+                    return render_template('error.html', msg="Super user is already existence")
+                else:
+                    tempspueruser = Superuser(username = superuser1.username, email = superuser1.email,
+                    last_seen=superuser1.last_seen)
+                    db.session.add(tempspueruser)
+                    db.session.commit()
+                    flash('You submit is Success!')
+                    return render_template('creat_spuer.html', title="admin", form=form, admin=True)
+            else:
+                return render_template('error.html', msg="Is not an existing username")
+        return render_template('creat_spuer.html', title="admin", form=form, admin=True)
+    else:
+        return render_template('creat_spuer.html', title="admin", form=form)
+
 @app.route('/inputgene', methods=['GET', 'POST'])
+@login_required
 def inputgene():
     form = InputGene()
     case = Case.query.all()
+    superuser = Superuser.query.filter_by(username=current_user.username).first()
     if not case:
-        return render_template('input.html', title="input", show_creat=True)
+        if superuser:
+            return render_template('input.html', title="input", no_case=True, super_user=True)
+        else:
+            return render_template('input.html', title="input")
     if form.validate_on_submit():
         return render_template('input.html', title="input", case=case, show_case=True)
 
@@ -172,6 +208,7 @@ def inputgene():
 
 # @app.route('/<username>/inputgene/<casename>', methods=['GET', 'POST'])
 @app.route('/inputgene/<casename>', methods=['GET', 'POST'])
+@login_required
 def inputgene_case(casename):
     #找到当前的case基于casename
     case = Case.query.filter_by(casename=casename).first()
@@ -248,6 +285,7 @@ def inputgene_case(casename):
     # return render_template('about.html')
 
 @app.route('/showresult/<casename>', methods=['GET', 'POST'])
+@login_required
 def show_result(casename):
     result = []
     case = Case.query.filter_by(casename=casename).first()
@@ -262,6 +300,7 @@ def show_result(casename):
         case=case, casename=casename)
 
 @app.route('/showrecord/<casename>', methods=['GET', 'POST'])
+@login_required
 def show_record(casename):
     case = Case.query.filter_by(casename=casename).first()
     record = Exchange.query.filter(Exchange.case_id == case.id).all()
@@ -271,6 +310,7 @@ def show_record(casename):
 #管理特定的case
 #@csrf.exempt
 @app.route('/manage/<casename>', methods=['GET', 'POST'])
+@login_required
 def manage_case(casename):
     superuser = Superuser.query.filter_by(username=current_user.username).first()
     curr_case = Case.query.filter_by(casename=casename).first()
@@ -299,8 +339,10 @@ def manage_case(casename):
     result = []
     resultp = Persongene.query.filter(Persongene.case_id == curr_case.id).all()
     for iresult in resultp:
-        if case.infect_id in iresult.self_body:
-            result.append([iresult.self_gene, "Infectiong"])
+        if not case.infect_id:
+            result.append([iresult.self_gene, "OK"])
+        elif case.infect_id in iresult.self_body or case.infect_id in iresult.self_gene:
+            result.append([iresult.self_gene, "Infecting"])
         else:
             result.append([iresult.self_gene, "OK"])
     record = Exchange.query.filter(Exchange.case_id == curr_case.id).all()
@@ -309,8 +351,11 @@ def manage_case(casename):
 
 #显示所有case
 @app.route('/manage', methods=['GET', 'POST'])
+@login_required
 def manage():
     #是否是超级用户如果不是，直接提示错误
+    if not current_user.username:
+        return "123"
     superuser = Superuser.query.filter_by(username=current_user.username).first()
     if not superuser:
         return render_template('error.html', title="Error", msg="You are not a teacher")
@@ -320,6 +365,7 @@ def manage():
         show_case=True,username=current_user.username, case=superuser.cases)
 
 @app.route('/<username>/creat', methods=['GET', 'POST'])
+@login_required
 def creat(username):
     #是否是超级用户如果不是，直接提示错误
     superuser = Superuser.query.filter_by(username=username).first()

@@ -28,7 +28,7 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 class EditProfileForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    #username = StringField('Username', validators=[DataRequired()])
     about_me = TextAreaField('About me', validators=[Length(min=0, max=4096)])
     submit = SubmitField('Submit')
 
@@ -53,7 +53,7 @@ class PostCase(FlaskForm):
     show_result = BooleanField('allow show infection result', default=True)
     show_record = BooleanField('allow show exchange record', default=True)
     allow_post = BooleanField('allow submit', default=True)
-    submit = SubmitField('Submit')
+    submit = SubmitField('PostCase')
 
 class ManageCase(FlaskForm):
     infect_id = TextAreaField('Set infect_id(Default is Null)', validators=[Length(min=0, max=128)])
@@ -64,6 +64,10 @@ class ManageCase(FlaskForm):
     submit = SubmitField('Submit')
 
 class InputGene(FlaskForm):
-    #post = TextAreaField('Say something', validators=[DataRequired(), Length(min=1, max=4096)])
     inputgene = TextAreaField("", validators=[DataRequired(), Length(min=1, max=128)])
     submit = SubmitField('Input Gene')
+
+
+class CreatSuper(FlaskForm):
+    supername = TextAreaField("Input super user name", validators=[DataRequired(), Length(min=1, max=128)])
+    submit = SubmitField('CreatSuperUser')
