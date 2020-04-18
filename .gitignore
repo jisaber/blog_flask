@@ -2,4 +2,4 @@
 *.pyc
 /venv/
 /microblog/migrations/
-*.db
+/microblog/*.db
