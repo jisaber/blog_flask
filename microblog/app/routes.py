@@ -199,7 +199,7 @@ def inputgene():
         if superuser:
             return render_template('input.html', title="input", no_case=True, super_user=True)
         else:
-            return render_template('input.html', title="input")
+            return render_template('input.html', title="input", no_case=True,)
     if form.validate_on_submit():
         return render_template('input.html', title="input", case=case, show_case=True)
 
