@@ -11,6 +11,8 @@ cd ./blog_flask/microblog
 flask run
 (http://127.0.0.1:5000/)
 ```
+
+nohup flask run --host 192.168.3.14 --port 6002 > myout.file 2>&1 &  
 ## 项目用到的包
 包名 安装方式 功能<br>
 ***

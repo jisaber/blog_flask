@@ -156,11 +156,8 @@ def explore():
                           next_url=next_url, prev_url=prev_url)
 
 @app.route('/about')
-def about():
-    return render_template('about.html')
-
-#username = db.Column(db.String(64), index=True, unique=True)
-#email = db.Column(db.String(120), index=True, unique=True)
+def About():
+    return render_template('./about/about.html')
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
@@ -199,7 +196,7 @@ def inputgene():
         if superuser:
             return render_template('input.html', title="input", no_case=True, super_user=True)
         else:
-            return render_template('input.html', title="input", no_case=True,)
+            return render_template('input.html', title="input", no_case=True)
     if form.validate_on_submit():
         return render_template('input.html', title="input", case=case, show_case=True)
 
